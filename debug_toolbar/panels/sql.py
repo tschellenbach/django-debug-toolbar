@@ -166,6 +166,7 @@ class SQLDebugPanel(DebugPanel):
             trans_id = None
             i = 0
             for alias, query in self._queries:
+                
                 trans_id = query.get('trans_id')
                 last_trans_id = trans_ids.get(alias)
                 
@@ -209,11 +210,54 @@ class SQLDebugPanel(DebugPanel):
             if trans_id:
                 self._queries[i-1][1]['ends_trans'] = True
         
+        # Get dupes before we do any processing/formatting of the queries
+        dupe_queries = self._get_dupe_queries()
+        
         self.record_stats({
             'databases': sorted(self._databases.items(), key=lambda x: -x[1]['time_spent']),
             'queries': [q for a, q in self._queries],
+            'dupe_queries': dupe_queries,
             'sql_time': self._sql_time,
         })
+      
+    def _get_dupe_queries(self):
+        """ Returns information about duplicate queries.
+        
+            Builds the _seen dict, which describes duplicate queries:
+            
+            _seen = {'<some query>': {'time': 0.123,
+                                       'queries': [q1, q2, q3]}
+            }
+            
+            ... where time is the total time taken to execute all iterations of
+            this query, and queries is a list of query objects that used this
+            query.
+            
+            The original query object is modifed - a boolean 'duplicate'
+            value is set, depending on whether or not this is a dupe query.
+        """      
+        self._seen = {}
+              
+        for alias, query in self._queries:        
+            sql = reformat_sql(query['raw_sql'])
+            c = self._seen.get(sql, {'time': 0, 'queries': []})
+            # has the SQL for this query already been seen?
+            if c['queries']:
+                # this query has been seen before, mark it as a dupe
+                print 'dupe'
+                query['duplicate'] = True
+            else:
+                # this is the first time we have seen this query
+                print 'non dupe'
+                query['duplicate'] = False
+                
+            # Add this query to the list of seen queries (either creating a
+            # entry, or appending to an already seen query
+            c['time'] += query['duration']
+            c['queries'].append(query)
+            self._seen[sql] = c
+        
+        return self._seen
 
 
 class BoldKeywordFilter(sqlparse.filters.Filter):

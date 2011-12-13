@@ -480,6 +480,10 @@
     background-color: #94b24d;
 }
 
+#djDebug .djDuplicateQuery {
+    background-color: #FF8B3D;
+}
+
 
 #djDebug .panelContent ul.stats {
     position: relative; 

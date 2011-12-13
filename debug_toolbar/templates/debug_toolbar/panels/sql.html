@@ -5,11 +5,39 @@
 		{% for alias, info in databases %}
 			<li>
 				<strong class="label"><span style="background-color: rgb({{ info.rgb_color|join:", " }})" class="color">&nbsp;</span> {{ alias }}</strong>
-				<span class="info">{{ info.time_spent|floatformat:"2" }} ms ({% blocktrans count info.num_queries as num %}{{ num }} query{% plural %}{{ num }} queries{% endblocktrans %})</span>
+				<span class="info">
+					{{ info.time_spent|floatformat:"2" }} ms ({% blocktrans count info.num_queries as num %}{{ num }} query{% plural %}{{ num }} queries,
+
+					{% endblocktrans %}
+					{{ dupe_queries|length }} unique)
+				</span>
+												
 			</li>
 		{% endfor %}
 	</ul>
 </div>
+
+{% if dupe_queries %}
+	<table>
+		<thead>
+		  <tr>
+			<th class="query">{% trans 'Query' %}</th>
+			<th>{% trans 'Executions' %}</th>
+			<th class="time">{% trans 'Total time (ms)' %}</th>
+		  </tr>
+		</thead>
+		<tbody>
+			{% for query, data in dupe_queries.iteritems %}
+				<tr>
+					<td>{{ query|safe }}</td>
+					<td>{{ data.queries|length }}</td>
+					<td>{{ data.time }}</td>
+				</tr>
+				
+			{% endfor %}
+		</tbody>
+	</table>
+{% endif %}
 
 {% if queries %}
 	<table>
@@ -24,7 +52,7 @@
 		</thead>
 		<tbody>
 			{% for query in queries %}
-				<tr class="djDebugHoverable {% cycle 'djDebugOdd' 'djDebugEven' %}{% if query.is_slow %} djDebugRowWarning{% endif %}{% if query.starts_trans %} djDebugStartTransaction{% endif %}{% if query.ends_trans %} djDebugEndTransaction{% endif %}{% if query.in_trans %} djDebugInTransaction{% endif %}" id="sqlMain_{{ forloop.counter }}">
+				<tr class="djDebugHoverable {% cycle 'djDebugOdd' 'djDebugEven' %}{% if query.is_slow %} djDebugRowWarning{% endif %}{% if query.starts_trans %} djDebugStartTransaction{% endif %}{% if query.ends_trans %} djDebugEndTransaction{% endif %}{% if query.in_trans %} djDebugInTransaction{% endif %}{% if query.duplicate %} djDuplicateQuery {% endif %}" id="sqlMain_{{ forloop.counter }}">
 					<td class="color"><span style="background-color: rgb({{ query.rgb_color|join:", " }});">&nbsp;</span></td>
 					<td class="toggle">
 						<a class="djToggleSwitch" data-toggle-id="{{ forloop.counter }}" data-toggle-open="+" data-toggle-close="-" href="javascript:void(0)">+</a>

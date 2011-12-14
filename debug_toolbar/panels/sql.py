@@ -238,10 +238,6 @@ class SQLDebugPanel(DebugPanel):
         """      
         self._seen = {}
 
-        from collections import Counter
-
-        #coun = Counter([q['raw_sql'] for q in se
-              
         for alias, query in self._queries:        
             sql = reformat_sql(query['raw_sql'])
             c = self._seen.get(sql, {'time': 0, 'queries': []})

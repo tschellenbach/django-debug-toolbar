@@ -250,7 +250,7 @@ class SQLDebugPanel(DebugPanel):
             # raw_sql, params are ignored when checking for dupes.
             inc_params = settings.DEBUG_TOOLBAR_CONFIG.get('SQL_DUPE_PARAMS', False)
             if inc_params:
-                # This is a tiny bit hacky. Only 'raq_sql' needs to be passed
+                # This is a tiny bit hacky. Only 'raw_sql' needs to be passed
                 # to reformat_sql, so here's a lambda funcion that just returns
                 # the query so we can use the same code for both sql/raw_sql.
                 func = lambda query: query

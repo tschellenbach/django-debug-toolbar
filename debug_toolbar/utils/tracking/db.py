@@ -74,9 +74,11 @@ class NormalCursorWrapper(object):
             enable_stacktraces = getattr(settings, 'DEBUG_TOOLBAR_CONFIG', {}) \
                                     .get('ENABLE_STACKTRACES', True)
             if enable_stacktraces:
-                stacktrace = tidy_stacktrace(reversed(get_stack()))
+                reversed_stack = reversed(get_stack())
+                stacktrace = tidy_stacktrace(reversed_stack)
             else:
                 stacktrace = []
+                
             _params = ''
             try:
                 _params = simplejson.dumps([force_unicode(x, strings_only=True) for x in params])
@@ -96,6 +98,7 @@ class NormalCursorWrapper(object):
             except:
                 pass
             del cur_frame
+            
 
             alias = getattr(self.db, 'alias', 'default')
             conn = connections[alias].connection
@@ -128,7 +131,6 @@ class NormalCursorWrapper(object):
                     'iso_level': conn.isolation_level,
                     'encoding': conn.encoding,
                 })
-
 
             # We keep `sql` to maintain backwards compatibility
             self.logger.record(**params)

@@ -5,6 +5,7 @@ from django.db.backends import BaseDatabaseWrapper
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy as __
+from django.conf import settings
 
 from debug_toolbar.utils.compat.db import connections
 from debug_toolbar.middleware import DebugToolbarMiddleware
@@ -210,8 +211,12 @@ class SQLDebugPanel(DebugPanel):
             if trans_id:
                 self._queries[i-1][1]['ends_trans'] = True
         
-        # Get dupes before we do any processing/formatting of the queries
-        dupe_queries = self._get_dupe_queries()
+        # Should we check for duplicate queries?
+        if hasattr(settings, 'DEBUG_TOOLBAR_CONFIG'):
+            if settings.DEBUG_TOOLBAR_CONFIG.get('SQL_DUPLICATES', False):
+                dupe_queries = self._get_dupe_queries()
+            else:
+                dupe_queries = None
         
         self.record_stats({
             'databases': sorted(self._databases.items(), key=lambda x: -x[1]['time_spent']),
@@ -238,8 +243,24 @@ class SQLDebugPanel(DebugPanel):
         """      
         self._seen = {}
 
-        for alias, query in self._queries:        
-            sql = reformat_sql(query['raw_sql'])
+        if hasattr(settings, 'DEBUG_TOOLBAR_CONFIG'):
+            # Should we be looking at sql or raw_sql?
+            # If sql, the params are included when checking for dupes. If
+            # raw_sql, params are ignored when checking for dupes.
+            inc_params = settings.DEBUG_TOOLBAR_CONFIG.get('SQL_DUPE_PARAMS', False)
+            if inc_params:
+                # This is a tiny bit hacky. Only 'raq_sql' needs to be passed
+                # to reformat_sql, so here's a lambda funcion that just returns
+                # the query so we can use the same code for both sql/raw_sql.
+                func = lambda query: query
+                sql_attr = 'sql'
+            else: 
+                func = reformat_sql
+                sql_attr = 'raw_sql'
+
+        for alias, query in self._queries:
+            sql = func(query[sql_attr])
+                
             c = self._seen.get(sql, {'time': 0, 'queries': []})
             # has the SQL for this query already been seen?
             if c['queries']:
@@ -254,6 +275,7 @@ class SQLDebugPanel(DebugPanel):
             c['time'] += query['duration']
             c['queries'].append(query)
             self._seen[sql] = c
+
         
         return self._seen
 

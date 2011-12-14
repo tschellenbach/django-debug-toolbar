@@ -123,7 +123,7 @@ class SQLDebugPanel(DebugPanel):
     
     def nav_subtitle(self):
         # TODO l10n: use ngettext
-        return "%d %s in %.2fms.\n%d duplicate queries." % (
+        return "%d %s in %.2fms.\n%d unique" % (
             self._num_queries,
             (self._num_queries == 1) and 'query' or 'queries',
             self._sql_time,
@@ -204,12 +204,8 @@ class SQLDebugPanel(DebugPanel):
                     try:
                         stacktrace.append(u'<span class="path">{0}/</span><span class="file">{1}</span> in <span class="func">{3}</span>(<span class="lineno">{2}</span>)\n  <span class="code">{4}</span>'.format(*params))
                     except IndexError:
-                        try:
-                            stacktrace.append(u'<span class="path">{0}/</span><span class="file">{1}</span> in <span class="func">{3}</span>(<span class="lineno">{2}</span>)\n  <span class="code">Code not found, windows issue?</span>'.format(*params))
-                        except IndexError:
-                            stacktrace.append(u'<span class="path">Broken Stracktrace, probably windows issue</span>')
                         # This frame doesn't have the expected format, so skip it and move on to the next one
-
+                        continue
                 query['stacktrace'] = mark_safe('\n'.join(stacktrace))
                 i += 1
             

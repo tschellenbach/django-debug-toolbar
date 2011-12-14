@@ -241,18 +241,16 @@ class SQLDebugPanel(DebugPanel):
             value is set, depending on whether or not this is a dupe query.
         """      
         self._seen = {}
-              
+
         for alias, query in self._queries:        
             sql = reformat_sql(query['raw_sql'])
             c = self._seen.get(sql, {'time': 0, 'queries': []})
             # has the SQL for this query already been seen?
             if c['queries']:
                 # this query has been seen before, mark it as a dupe
-                print 'dupe'
                 query['duplicate'] = True
             else:
                 # this is the first time we have seen this query
-                print 'non dupe'
                 query['duplicate'] = False
                 
             # Add this query to the list of seen queries (either creating a

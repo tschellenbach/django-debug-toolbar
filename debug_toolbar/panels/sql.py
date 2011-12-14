@@ -123,10 +123,11 @@ class SQLDebugPanel(DebugPanel):
     
     def nav_subtitle(self):
         # TODO l10n: use ngettext
-        return "%d %s in %.2fms" % (
+        return "%d %s in %.2fms.\n%d duplicate queries." % (
             self._num_queries,
             (self._num_queries == 1) and 'query' or 'queries',
-            self._sql_time
+            self._sql_time,
+            len(self._seen),
         )
     
     def title(self):

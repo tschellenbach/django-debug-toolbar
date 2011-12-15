@@ -13,6 +13,7 @@ from debug_toolbar.panels import DebugPanel
 from debug_toolbar.utils import sqlparse
 from debug_toolbar.utils.tracking.db import CursorWrapper
 from debug_toolbar.utils.tracking import replace_call
+from debug_toolbar.utils import Counter
 
 
 # Inject our tracking cursor
@@ -259,25 +260,20 @@ class SQLDebugPanel(DebugPanel):
                 func = reformat_sql
                 sql_attr = 'raw_sql'
 
+        # Fill the counter with the queries, so we can use it to easily
+        # count occurances while processing the query list. This list comp
+        # populates the counter with formated SQL (either sql or raw_sql).
+        c = Counter([func(q[sql_attr]) for a, q in self._queries])
+
         for alias, query in self._queries:
             sql = func(query[sql_attr])
-                
-            c = self._seen.get(sql, {'time': 0, 'queries': []})
-            # has the SQL for this query already been seen?
-            if c['queries']:
-                # this query has been seen before, mark it as a dupe
-                query['duplicate'] = True
-            else:
-                # this is the first time we have seen this query
-                query['duplicate'] = False
-                
-            # Add this query to the list of seen queries (either creating a
-            # entry, or appending to an already seen query
-            c['time'] += query['duration']
-            c['queries'].append(query)
-            self._seen[sql] = c
-
-        
+            # Is there more than one occurrance of this query?
+            query['duplicate'] = (c[sql] > 1)
+            # Add this query to the list of occurrances for this query.
+            data = self._seen.get(sql, {'time': 0, 'queries': []})
+            data['queries'].append(query)
+            data['time'] += query['duration']
+            self._seen[sql] = data
         return self._seen
 
 

@@ -79,6 +79,8 @@ class SQLDebugPanel(DebugPanel):
         self._databases = {}
         self._transaction_status = {}
         self._transaction_ids = {}
+        self._seen = {}
+
     
     def get_transaction_id(self, alias):
         conn = connections[alias].connection
@@ -242,8 +244,6 @@ class SQLDebugPanel(DebugPanel):
             The original query object is modifed - a boolean 'duplicate'
             value is set, depending on whether or not this is a dupe query.
         """      
-        self._seen = {}
-
         if hasattr(settings, 'DEBUG_TOOLBAR_CONFIG'):
             # Should we be looking at sql or raw_sql?
             # If sql, the params are included when checking for dupes. If

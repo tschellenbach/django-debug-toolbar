@@ -214,11 +214,10 @@ class SQLDebugPanel(DebugPanel):
                 self._queries[i-1][1]['ends_trans'] = True
         
         # Should we check for duplicate queries?
+        dupe_queries = None
         if hasattr(settings, 'DEBUG_TOOLBAR_CONFIG'):
             if settings.DEBUG_TOOLBAR_CONFIG.get('SQL_DUPLICATES', False):
                 dupe_queries = self._get_dupe_queries()
-            else:
-                dupe_queries = None
         
         self.record_stats({
             'databases': sorted(self._databases.items(), key=lambda x: -x[1]['time_spent']),

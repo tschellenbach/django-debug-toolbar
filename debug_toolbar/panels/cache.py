@@ -23,8 +23,15 @@ class CacheStatTracker(BaseCache):
         self.total_time = 0
     
     def _get_func_info(self):
-        stack = inspect.stack()[2]
-        return (stack[1], stack[2], stack[3], stack[4])
+        """ Some attempts to get stack info fail, so try/except so we can set
+            a message if this happens.
+        """
+        try: 
+            stack = inspect.stack()[2]
+        except IndexError:
+            return ('Unable to get stack info',)
+        else: 
+            return (stack[1], stack[2], stack[3], stack[4])
     
     def get(self, key, default=None):
         t = time.time()

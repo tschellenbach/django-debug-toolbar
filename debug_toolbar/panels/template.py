@@ -28,56 +28,22 @@ else:
         Template.original_render = Template._render
         Template._render = instrumented_test_render
 
-# -- testing jinja2 stuff
-def new_get_template(func):
-    def get_template(template_name):
-        print 'get template: ', template_name
-        return func(template_name)
-    return get_template
 
-def new_render_to_string(func):
-    def render_to_string(template_name, dictionary=None, context_instance=None):
-        print 'rendering to string'
-        #print dictionary
-        #print context_instance
-        return func(template_name, dictionary, context_instance)
-    return render_to_string
-
-def new_render_to_resp(func):
-    def render_to_response(template_name, dictionary=None,
-                           context_instance=None, mimetype=None):
-        #print 'rendering ', template_name
-        #print dictionary
-        #print context_instance
-        template = func(template_name, dictionary, context_instance, mimetype)
-        #print dir(template)
-        #template_rendered.send(sender=template, template=template_name, context=dictionary)
-    return render_to_response
-
+# Monkey patch coffin's render function to send template_rendered signal
 def new_render(func):
     def render(self, context=None):
         template_rendered.send(sender=self, template=self,
                                context=context)
-        template_string = func(self, context)
-        print 'rendering template: ', self
-        #print template
-        #print context
-        return template_string
+        return func(self, context)
     return render
-        
-        
+
+
 try:
     import coffin
 except ImportError:
     pass
 else:
-    print 'patching get_template'
-    #coffin.template.loader.get_template = new_get_template(coffin.template.loader.get_template)
-    #coffin.template.loader.render_to_string = new_render_to_string(coffin.template.loader.render_to_string)
-    #coffin.shortcuts.render_to_response = new_render_to_resp(coffin.shortcuts.render_to_response)
     coffin.template.Template.render = new_render(coffin.template.Template.render)
-
-# -- end testing jinja2 stuff 
 
 
 # MONSTER monkey-patch
@@ -103,16 +69,7 @@ class TemplateDebugPanel(DebugPanel):
     
     def _store_template_info(self, sender, **kwargs):
         t = kwargs['template']
-
-        """
-        if not hasattr(t, 'name'):
-            print 'unicode'
-            raise(t)
-        """
-        print 'processing: ', 
-        print t.name
         if t.name and t.name.startswith('debug_toolbar/'):
-            print 'skipping template: ', t.name
             return  # skip templates that we are generating through the debug toolbar.
         context_data = kwargs['context']
         
@@ -154,8 +111,6 @@ class TemplateDebugPanel(DebugPanel):
                 pass
         kwargs['context'] = context_list
         self.templates.append(kwargs)
-        print 'Added template to list'
-        print kwargs['template']
     
     def nav_title(self):
         return _('Templates')
@@ -182,11 +137,11 @@ class TemplateDebugPanel(DebugPanel):
             info = {}
             # Clean up some info about templates
             template = template_data.get('template', None)
-            print template.name
-            if not hasattr(template, 'origin'):
-                template.origin_name = 'No origin'
-            else:
+            if hasattr(template, 'origin') and hasattr(template.origin, 'name'):
                 template.origin_name = template.origin.name
+            else:
+                template.origin_name = 'No origin'
+
             info['template'] = template
             # Clean up context for better readability
             if getattr(settings, 'DEBUG_TOOLBAR_CONFIG', {}).get('SHOW_TEMPLATE_CONTEXT', True):

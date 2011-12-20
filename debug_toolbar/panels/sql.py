@@ -207,6 +207,7 @@ class SQLDebugPanel(DebugPanel):
                     try:
                         stacktrace.append(u'<span class="path">{0}/</span><span class="file">{1}</span> in <span class="func">{3}</span>(<span class="lineno">{2}</span>)\n  <span class="code">{4}</span>'.format(*params))
                     except IndexError:
+                        stacktrace.append(u'<span class="path">{0}/</span><span class="file">{1}</span> in <span class="func">{3}</span>(<span class="lineno">{2}</span>)\n  <span class="code">Couldnt find the code</span>'.format(*params))
                         # This frame doesn't have the expected format, so skip it and move on to the next one
                         continue
                 query['stacktrace'] = mark_safe('\n'.join(stacktrace))

@@ -73,8 +73,13 @@ class TemplateDebugPanel(DebugPanel):
             return  # skip templates that we are generating through the debug toolbar.
         context_data = kwargs['context']
         
+        #context_data can be either a dict or a context data object
         context_list = []
-        for context_layer in context_data.dicts:
+        context_data_dicts = [context_data]
+        if hasattr(context_data, 'dicts'):
+            context_data_dicts = context_data.dicts
+            
+        for context_layer in context_data_dicts:
             temp_layer = {}
             if hasattr(context_layer, 'items'):
                 for key, value in context_layer.items():

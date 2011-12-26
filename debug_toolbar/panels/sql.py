@@ -16,8 +16,8 @@ from debug_toolbar.utils.tracking import replace_call
 
 FIELDS_RE = re.compile('^(.*SELECT<[^>]+>)(.+?)(<[^>]+>FROM.+)$', re.DOTALL)
 COLLAPSED_FIELDS_HTML = '''
-<a class="djDebugUncollapsed djDebugToggle" href="#">%s &bull;&bull;&bull; %s</a>
-<a class="djDebugCollapsed djDebugToggle" href="#">%s</a>
+<span class="djDebugUncollapsed">%s &bull;&bull;&bull; %s</span>
+<span class="djDebugCollapsed">%s</span>
 '''.strip()
 
 ANONYMIZE_QUERY_REPLACEMENTS = (
@@ -416,6 +416,6 @@ def reformat_sql(sql, tables=None):
             )
         )
 
-    sql = swap_fields(sql)
+    sql = swap_fields(sql).replace('...', '&bull;'*3)
     return sql
 

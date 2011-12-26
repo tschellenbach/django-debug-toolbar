@@ -1,0 +1,34 @@
+.hll { background-color: #ffffcc !important; }
+.djdt_c { font-style: italic !important; } /* Comment */
+.djdt_err { border: 1px solid #FF0000 !important; } /* Error */
+.djdt_k { font-weight: bold !important; } /* Keyword */
+.djdt_cm { font-style: italic !important; } /* Comment.Multiline */
+.djdt_c1 { font-style: italic !important; } /* Comment.Single */
+.djdt_cs { font-style: italic !important; } /* Comment.Special */
+.djdt_ge { font-style: italic !important; } /* Generic.Emph */
+.djdt_gh { font-weight: bold !important; } /* Generic.Heading */
+.djdt_gp { font-weight: bold !important; } /* Generic.Prompt */
+.djdt_gs { font-weight: bold !important; } /* Generic.Strong */
+.djdt_gu { font-weight: bold !important; } /* Generic.Subheading */
+.djdt_kc { font-weight: bold !important; } /* Keyword.Constant */
+.djdt_kd { font-weight: bold !important; } /* Keyword.Declaration */
+.djdt_kn { font-weight: bold !important; } /* Keyword.Namespace */
+.djdt_kr { font-weight: bold !important; } /* Keyword.Reserved */
+.djdt_s { font-style: italic !important; } /* Literal.String */
+.djdt_nc { font-weight: bold !important; } /* Name.Class */
+.djdt_ni { font-weight: bold !important; } /* Name.Entity */
+.djdt_ne { font-weight: bold !important; } /* Name.Exception */
+.djdt_nn { font-weight: bold !important; } /* Name.Namespace */
+.djdt_nt { font-weight: bold !important; } /* Name.Tag */
+.djdt_ow { font-weight: bold !important; } /* Operator.Word */
+.djdt_sb { font-style: italic !important; } /* Literal.String.Backtick */
+.djdt_sc { font-style: italic !important; } /* Literal.String.Char */
+.djdt_sd { font-style: italic !important; } /* Literal.String.Doc */
+.djdt_s2 { font-style: italic !important; } /* Literal.String.Double */
+.djdt_se { font-weight: bold !important; font-style: italic !important; } /* Literal.String.Escape */
+.djdt_sh { font-style: italic !important; } /* Literal.String.Heredoc */
+.djdt_si { font-weight: bold !important; font-style: italic !important; } /* Literal.String.Interpol */
+.djdt_sx { font-style: italic !important; } /* Literal.String.Other */
+.djdt_sr { font-style: italic !important; } /* Literal.String.Regex */
+.djdt_s1 { font-style: italic !important; } /* Literal.String.Single */
+.djdt_ss { font-style: italic !important; } /* Literal.String.Symbol */

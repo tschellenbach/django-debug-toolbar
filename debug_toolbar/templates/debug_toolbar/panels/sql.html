@@ -1,26 +1,50 @@
 {% load i18n %}
 {% load debug_toolbar_utils %}
 <div class="clearfix">
-	<ul class="stats">
-		{% for alias, info in databases %}
-			<li>
-				<strong class="label"><span style="background-color: rgb({{ info.rgb_color|join:", " }})" class="color">&nbsp;</span> {{ alias }}</strong>
-				<span class="info">
-					{{ info.time_spent|floatformat:"2" }} ms ({% blocktrans count info.num_queries as num %}{{ num }} query{% plural %}{{ num }} queries,
+	<fieldset class="djFieldSet">
+	    <legend>Databases</legend>
+	    <ul class="stats">
+		    {% for alias, info in databases %}
+		    <li>
+		        <input onclick="djdt.jQuery(this.value).toggle(djdt.jQuery(this).attr('checked'));"
+		            checked="checked" value=".query_database_{{ alias }}" id="database_filter_{{ alias }}" 
+		            type="checkbox">
 
-					{% endblocktrans %}
-					{{ dupe_queries|length }} unique)
-				</span>
-												
-			</li>
-		{% endfor %}
-	</ul>
+		        <label for="database_filter_{{ alias }}">
+			        <strong class="label">
+			            <span style="background-color: rgb({{ info.rgb_color|join:", " }})" class="color">&nbsp;</span>
+			            {{ alias }}
+			        </strong>
+
+				    {{ info.time_spent|floatformat:"2" }} ms
+				    ({% blocktrans count info.num_queries as num %}{{ num }} query{% plural %}{{ num }}
+				    queries,{% endblocktrans %} {{ dupe_queries|length }} unique)
+			    </label>
+		    </li>
+		    {% endfor %}
+	    </ul>
+	</fieldset>
+	<fieldset class="djFieldSet">
+	    <legend>Tables</legend>
+	    <ul class="stats">
+	        {% for table in tables %}
+		    <li>
+		        <input onclick="djdt.jQuery(this.value).toggle(djdt.jQuery(this).attr('checked'));"
+		            checked="checked" value=".query_table_{{ table }}" id="table_filter_{{ table }}" 
+		            type="checkbox">
+		        <label for="table_filter_{{ table }}">{{ table }}</label>
+		    </li>
+	        {% endfor %}
+	    </ul>
+	</fieldset>
 </div>
 
 {% if dupe_queries %}
 	<table>
 		<thead>
 		  <tr>
+		    <th></th>
+			<th class="toggle">&nbsp;</th>
 			<th class="query">{% trans 'Query' %}</th>
 			<th>{% trans 'Executions' %}</th>
 			<th class="time">{% trans 'Total time (ms)' %}</th>
@@ -28,12 +52,53 @@
 		</thead>
 		<tbody>
 			{% for query, data in dupe_queries.iteritems %}
-				<tr>
+			    {# wow... I almost forgot how bad the Django template system is... glad we have Jinja2 these days. But for the time being (if,else(if,else,endif),endif) #}
+				<tr style="{% spaceless %}
+				        {% if data.queries|length > 10 %}
+				            background-color: #f00;
+				        {% else %}
+				            {% if data.queries|length > 5 %}
+				                background-color: #f30;
+				            {% else %}
+				                {% if data.queries|length > 3 %}
+				                    background-color: #f60;
+				                {% else %}
+				                    {% if data.queries|length > 2 %}
+				                        background-color: #f90;
+				                    {% else %}
+				                        {% if data.queries|length > 1 %}
+				                            background-color: #fc0;
+				                        {% endif %}
+				                    {% endif %}
+				                {% endif %}
+				            {% endif %}
+				        {% endif %}
+				    {% endspaceless %}"
+				    class="
+				        djDebugHoverable
+				        {% for table in data.tables %}
+				        query_table_{{ table }}
+				        {% endfor %}
+				        query_database_{{ data.alias }}
+				    "
+				    id="sqlMain_unique_query_{{ forloop.counter }}">
+		            <td><input onclick="djdt.jQuery(this.value).toggle(djdt.jQuery(this).attr('checked'));" checked="checked" value=".query_group_{{ data.hash }}" type="checkbox"></td>
+					<td class="toggle">
+						<a class="djToggleSwitch" data-toggle-id="unique_query_{{ forloop.counter }}" data-toggle-open="+" data-toggle-close="-" href="javascript:void(0)">+</a>
+					</td>
 					<td>{{ query|safe }}</td>
 					<td>{{ data.queries|length }}</td>
 					<td>{{ data.time }}</td>
 				</tr>
-				
+				<tr class="
+				        djUnselected
+				        djDebugHoverable
+				        {% cycle 'djDebugOdd' 'djDebugEven' %}
+				        {% if query.is_slow %} djDebugRowWarning{% endif %}
+				        djToggleDetails_unique_query_{{ forloop.counter }}
+				    " id="sqlDetails_unique_query_{{ forloop.counter }}">
+				    <td colspan="5"></td>
+				</tr>
 			{% endfor %}
 		</tbody>
 	</table>
@@ -44,6 +109,7 @@
 		<thead>
 			<tr>
 				<th class="color">&nbsp;</th>
+				<th class="toggle">&nbsp;</th>
 				<th class="query" colspan="2">{% trans 'Query' %}</th>
 				<th class="timeline">{% trans 'Timeline' %}</th>
 				<th class="time">{% trans 'Time (ms)' %}</th>
@@ -52,10 +118,22 @@
 		</thead>
 		<tbody>
 			{% for query in queries %}
-				<tr class="djDebugHoverable {% cycle 'djDebugOdd' 'djDebugEven' %}{% if query.is_slow %} djDebugRowWarning{% endif %}{% if query.starts_trans %} djDebugStartTransaction{% endif %}{% if query.ends_trans %} djDebugEndTransaction{% endif %}{% if query.in_trans %} djDebugInTransaction{% endif %}{% if query.duplicate %} djDuplicateQuery {% endif %}" id="sqlMain_{{ forloop.counter }}">
+				<tr class="{% spaceless %}
+				        djDebugHoverable
+				        query_group_{{ query.hash }}
+				        {% for table in query.tables %}
+				        query_table_{{ table }}
+				        {% endfor %}
+				        query_database_{{ query.alias }}
+				        {% cycle 'djDebugOdd' 'djDebugEven' %}
+				        {% if query.is_slow %}djDebugRowWarning{% endif %}
+				        {% if query.starts_trans %}djDebugStartTransaction{% endif %}
+				        {% if query.ends_trans %}djDebugEndTransaction{% endif %}
+				        {% if query.in_trans %}djDebugInTransaction{% endif %}
+				    {% endspaceless %}" id="sqlMain_query_{{ forloop.counter }}">
 					<td class="color"><span style="background-color: rgb({{ query.rgb_color|join:", " }});">&nbsp;</span></td>
 					<td class="toggle">
-						<a class="djToggleSwitch" data-toggle-id="{{ forloop.counter }}" data-toggle-open="+" data-toggle-close="-" href="javascript:void(0)">+</a>
+						<a class="djToggleSwitch" data-toggle-id="query_{{ forloop.counter }}" data-toggle-open="+" data-toggle-close="-" href="javascript:void(0);">+</a>
 					</td>
 					<td class="query">
 						<div class="djDebugSqlWrap">
@@ -80,7 +158,13 @@
 					{% endif %}
 					</td>
 				</tr>
-				<tr class="djUnselected djDebugHoverable {% cycle 'djDebugOdd' 'djDebugEven' %}{% if query.is_slow %} djDebugRowWarning{% endif %} djToggleDetails_{{ forloop.counter }}" id="sqlDetails_{{ forloop.counter }}">
+				<tr class="
+				        djDebugHoverable
+				        djUnselected
+				        {% cycle 'djDebugOdd' 'djDebugEven' %}
+				        {% if query.is_slow %} djDebugRowWarning{% endif %}
+				        djToggleDetails_query_{{ forloop.counter }}
+				    " id="sqlDetails_query_{{ forloop.counter }}">
 					<td colspan="2"></td>
 					<td colspan="4">
 						<div class="djSQLDetailsDiv">

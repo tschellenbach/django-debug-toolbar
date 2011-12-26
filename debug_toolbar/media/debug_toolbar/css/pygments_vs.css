@@ -1,0 +1,33 @@
+.hll { background-color: #ffffcc !important; }
+.djdt_c { color: #008000 !important; } /* Comment */
+.djdt_err { border: 1px solid #FF0000 !important; } /* Error */
+.djdt_k { color: #0000ff !important; } /* Keyword */
+.djdt_cm { color: #008000 !important; } /* Comment.Multiline */
+.djdt_cp { color: #0000ff !important; } /* Comment.Preproc */
+.djdt_c1 { color: #008000 !important; } /* Comment.Single */
+.djdt_cs { color: #008000 !important; } /* Comment.Special */
+.djdt_ge { font-style: italic !important; } /* Generic.Emph */
+.djdt_gh { font-weight: bold !important; } /* Generic.Heading */
+.djdt_gp { font-weight: bold !important; } /* Generic.Prompt */
+.djdt_gs { font-weight: bold !important; } /* Generic.Strong */
+.djdt_gu { font-weight: bold !important; } /* Generic.Subheading */
+.djdt_kc { color: #0000ff !important; } /* Keyword.Constant */
+.djdt_kd { color: #0000ff !important; } /* Keyword.Declaration */
+.djdt_kn { color: #0000ff !important; } /* Keyword.Namespace */
+.djdt_kp { color: #0000ff !important; } /* Keyword.Pseudo */
+.djdt_kr { color: #0000ff !important; } /* Keyword.Reserved */
+.djdt_kt { color: #2b91af !important; } /* Keyword.Type */
+.djdt_s { color: #a31515 !important; } /* Literal.String */
+.djdt_nc { color: #2b91af !important; } /* Name.Class */
+.djdt_ow { color: #0000ff !important; } /* Operator.Word */
+.djdt_sb { color: #a31515 !important; } /* Literal.String.Backtick */
+.djdt_sc { color: #a31515 !important; } /* Literal.String.Char */
+.djdt_sd { color: #a31515 !important; } /* Literal.String.Doc */
+.djdt_s2 { color: #a31515 !important; } /* Literal.String.Double */
+.djdt_se { color: #a31515 !important; } /* Literal.String.Escape */
+.djdt_sh { color: #a31515 !important; } /* Literal.String.Heredoc */
+.djdt_si { color: #a31515 !important; } /* Literal.String.Interpol */
+.djdt_sx { color: #a31515 !important; } /* Literal.String.Other */
+.djdt_sr { color: #a31515 !important; } /* Literal.String.Regex */
+.djdt_s1 { color: #a31515 !important; } /* Literal.String.Single */
+.djdt_ss { color: #a31515 !important; } /* Literal.String.Symbol */

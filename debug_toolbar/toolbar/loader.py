@@ -9,7 +9,7 @@ from django.utils.datastructures import SortedDict
 from django.utils.safestring import mark_safe
 
 class DebugToolbar(object):
-    
+
     def __init__(self, request):
         self.request = request
         self._panels = SortedDict()
@@ -39,25 +39,25 @@ class DebugToolbar(object):
         )
         self.load_panels()
         self.stats = {}
-    
+
     def _get_panels(self):
         return self._panels.values()
     panels = property(_get_panels)
-    
+
     def get_panel(self, cls):
         return self._panels[cls]
-    
+
     def load_panels(self):
         """
         Populate debug panels
         """
         from django.conf import settings
         from django.core import exceptions
-        
+
         # Check if settings has a DEBUG_TOOLBAR_PANELS, otherwise use default
         if hasattr(settings, 'DEBUG_TOOLBAR_PANELS'):
             self.default_panels = settings.DEBUG_TOOLBAR_PANELS
-        
+
         for panel_path in self.default_panels:
             try:
                 dot = panel_path.rindex('.')
@@ -72,25 +72,35 @@ class DebugToolbar(object):
                 panel_class = getattr(mod, panel_classname)
             except AttributeError:
                 raise exceptions.ImproperlyConfigured, 'Toolbar Panel module "%s" does not define a "%s" class' % (panel_module, panel_classname)
-            
+
             try:
                 panel_instance = panel_class(context=self.template_context)
             except:
                 raise # Bubble up problem loading panel
-            
+
             self._panels[panel_class] = panel_instance
-    
+
     def render_toolbar(self):
         """
         Renders the overall Toolbar with panels inside.
         """
-        media_path = os.path.join(os.path.dirname(__file__), os.pardir, 'media', 'debug_toolbar')
-        
+        media_path = os.path.join(os.path.dirname(__file__), os.pardir,
+            'media', 'debug_toolbar')
+        read_css = lambda f: open(os.path.join(media_path, 'css', f)).read()
+        read_js = lambda f: open(os.path.join(media_path, 'js', f)).read()
+
         context = self.template_context.copy()
         context.update({
             'panels': self.panels,
-            'js': mark_safe(open(os.path.join(media_path, 'js', 'toolbar.min.js'), 'r').read()),
-            'css': mark_safe(open(os.path.join(media_path, 'css', 'toolbar.min.css'), 'r').read()),
+            'js': mark_safe('\n'.join([
+                read_js('jquery.js'),
+                read_js('jquery.cookie.js'),
+                read_js('toolbar.js'),
+            ])),
+            'css': mark_safe('\n'.join([
+                read_css('toolbar.css'),
+                read_css('pygments_pastie.css'),
+            ])),
         })
-        
+
         return render_to_string('debug_toolbar/base.html', context)

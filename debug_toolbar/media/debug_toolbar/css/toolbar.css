@@ -497,7 +497,7 @@
 }
 #djDebug .panelContent ul.stats li span.color {
     height: 12px;
-    width: 3px;
+    width: 12px;
     display: inline-block;
 }
 #djDebug .panelContent ul.stats li span.info {
@@ -519,10 +519,10 @@
     min-width: 70px;
 }
 #djdebug .panelcontent table .color {
-    width: 3px;
+    width: 12px;
 }
 #djdebug .panelcontent table .color span {
-    width: 3px;
+    width: 12px;
     height: 12px;
     overflow: hidden;
     padding: 0;
@@ -582,3 +582,14 @@
         display: none;
     }
 }
+
+#djDebug fieldset.djFieldSet, #djDebug fieldset.djFieldSet legend{
+    border: 1px solid #fff;
+}
+
+#djDebug fieldset.djFieldSet li, #djDebug fieldset.djFieldSet .label, #djDebug fieldset.djFieldSet input{
+    list-style-type: none;
+    margin: 0px 5px;
+    float: left;
+}
+

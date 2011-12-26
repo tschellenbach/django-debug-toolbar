@@ -59,15 +59,16 @@ window.djdt = (function(window, document, jQuery) {
 			$('#djDebug a.djToggleSwitch').click(function(e) {
 				e.preventDefault();
 				var btn = $(this);
+				var panel = btn.parents('.djDebugPanelContent');
 				var id = btn.attr('data-toggle-id');
 				var open_me = btn.text() == btn.attr('data-toggle-open');
 				if (id == '' || !id) {
 					return;
 				}
 				
-                btn.parents('.djDebugPanelContent').find('#sqlMain_' + id).find('.djDebugCollapsed').toggle(open_me);
-                btn.parents('.djDebugPanelContent').find('#sqlMain_' + id).find('.djDebugUncollapsed').toggle(!open_me);
-				$(this).parents('.djDebugPanelContent').find('.djToggleDetails_' + id).each(function(){
+                panel.find('#sqlMain_' + id).find('.djDebugCollapsed').toggle(open_me);
+                panel.find('#sqlMain_' + id).find('.djDebugUncollapsed').toggle(!open_me);
+				panel.find('.djToggleDetails_' + id).each(function(){
 					var $this = $(this);
 					if (open_me) {
 						$this.addClass('djSelected');

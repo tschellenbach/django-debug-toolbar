@@ -170,6 +170,7 @@ class SQLDebugPanel(DebugPanel):
         return ''
 
     def process_response(self, request, response):
+        tables = set()
         if self._queries:
             width_ratio_tally = 0
             factor = int(256.0/(len(self._databases)*2.5))
@@ -191,7 +192,6 @@ class SQLDebugPanel(DebugPanel):
             trans_ids = {}
             trans_id = None
             i = 0
-            tables = set()
             for alias, query in self._queries:
 
                 trans_id = query.get('trans_id')

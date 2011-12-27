@@ -175,7 +175,7 @@ class Counter(dict):
         >>> c = Counter({'a': 4, 'b': 2})           # a new counter from a mapping
         >>> c = Counter(a=4, b=2)                   # a new counter from keyword args
 
-        '''        
+        '''
         self.update(iterable, **kwds)
 
     def __missing__(self, key):
@@ -188,7 +188,7 @@ class Counter(dict):
         >>> Counter('abracadabra').most_common(3)
         [('a', 5), ('r', 2), ('b', 2)]
 
-        '''        
+        '''
         if n is None:
             return sorted(self.iteritems(), key=itemgetter(1), reverse=True)
         return nlargest(n, self.iteritems(), key=itemgetter(1))
@@ -212,8 +212,8 @@ class Counter(dict):
 
     @classmethod
     def fromkeys(cls, iterable, v=None):
-        raise NotImplementedError(
-            'Counter.fromkeys() is undefined.  Use Counter(iterable) instead.')
+        raise NotImplementedError('Counter.fromkeys() is undefined. '
+            'Use Counter(iterable) instead.')
 
     def update(self, iterable=None, **kwds):
         '''Like dict.update() but add counts instead of replacing them.
@@ -227,7 +227,7 @@ class Counter(dict):
         >>> c['h']                      # four 'h' in which, witch, and watch
         4
 
-        '''        
+        '''
         if iterable is not None:
             if hasattr(iterable, 'iteritems'):
                 if self:

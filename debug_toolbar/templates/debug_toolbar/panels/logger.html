@@ -1,5 +1,44 @@
 {% load i18n %}
+{# in Jinja this would have been a macro... but now we'll just duplicate the code #}
+{% if channels %}
+    <fieldset class="djFieldSet">
+	    <legend>Channels</legend>
+	    <ul class="stats">
+	        {% for channel, count in channels %}
+		    <li>
+		        <label>
+		            <input
+		                class="filter"
+                        value=".log_channel_{{ channel|slugify }}"
+		                type="checkbox">
+                {{ channel }} ({{ count }})</label>
+		    </li>
+	        {% endfor %}
+	    </ul>
+    </fieldset>
+{% endif %}
+{% if levels %}
+    <fieldset class="djFieldSet">
+	    <legend>Channels</legend>
+	    <ul class="stats">
+	        {% for level, count in levels %}
+		    <li>
+		        <label>
+		            <input
+		                class="filter"
+                        value=".log_level_{{ level }}"
+		                type="checkbox">
+                {{ level }} ({{ count }})</label>
+		    </li>
+	        {% endfor %}
+	    </ul>
+    </fieldset>
+{% endif %}
 {% if records %}
+    <fieldset class="djFieldSet">
+	    <legend>Search</legend>
+	    <input type="text" class="search" name=".log_search .log_searchable">
+	</fieldset>
 	<table>
 		<thead>
 			<tr>
@@ -12,11 +51,16 @@
 		</thead>
 		<tbody>
 			{% for record in records %}
-				<tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}">
+				<tr class="{% spaceless %}
+				    {% cycle 'djDebugOdd' 'djDebugEven' %}
+				    log_channel_{{ record.channel|slugify }}
+				    log_level_{{ record.level }}
+				    log_search
+				    {% endspaceless %}">
 					<td>{{ record.level }}</td>
 					<td>{{ record.time|date:"h:i:s m/d/Y" }}</td>
 					<td>{{ record.channel|default:"-" }}</td>
-					<td>{{ record.message }}</td>
+					<td class="log_searchable">{{ record.message }}</td>
 					<td>{{ record.file }}:{{ record.line }}</td>
 				</tr>
 			{% endfor %}

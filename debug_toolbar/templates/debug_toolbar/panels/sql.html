@@ -6,8 +6,9 @@
 	    <ul class="stats">
 		    {% for alias, info in databases %}
 		    <li>
-		        <input onclick="djdt.jQuery(this.value).toggle(djdt.jQuery(this).attr('checked'));"
-		            checked="checked" value=".query_database_{{ alias }}" id="database_filter_{{ alias }}" 
+		        <input class="filter"
+		            value=".query_database_{{ alias }}"
+		            id="database_filter_{{ alias }}" 
 		            type="checkbox">
 
 		        <label for="database_filter_{{ alias }}">
@@ -29,8 +30,10 @@
 	    <ul class="stats">
 	        {% for table in tables %}
 		    <li>
-		        <input onclick="djdt.jQuery(this.value).toggle(djdt.jQuery(this).attr('checked'));"
-		            checked="checked" value=".query_table_{{ table }}" id="table_filter_{{ table }}" 
+		        <input
+		            class="filter"
+                    value=".query_table_{{ table }}"
+                    id="table_filter_{{ table }}"
 		            type="checkbox">
 		        <label for="table_filter_{{ table }}">{{ table }}</label>
 		    </li>
@@ -82,7 +85,10 @@
 				        query_database_{{ data.alias }}
 				    "
 				    id="sqlMain_unique_query_{{ forloop.counter }}">
-		            <td><input onclick="djdt.jQuery(this.value).toggle(djdt.jQuery(this).attr('checked'));" checked="checked" value=".query_group_{{ data.hash }}" type="checkbox"></td>
+		            <td><input
+		                class="filter"
+                        value=".query_group_{{ data.hash }}"
+                        type="checkbox"></td>
 					<td class="toggle">
 						<a class="djToggleSwitch" data-toggle-id="unique_query_{{ forloop.counter }}" data-toggle-open="+" data-toggle-close="-" href="javascript:void(0)">+</a>
 					</td>

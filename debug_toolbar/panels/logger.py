@@ -6,28 +6,31 @@ except ImportError:
     threading = None
 from django.utils.translation import ugettext_lazy as _, ungettext
 from debug_toolbar.panels import DebugPanel
+from debug_toolbar import utils
 
 
 class LogCollector(object):
+
     def __init__(self):
         if threading is None:
-            raise NotImplementedError("threading module is not available, \
-                the logging panel cannot be used without it")
-        self.records = {} # a dictionary that maps threads to log records
+            raise NotImplementedError('threading module is not available, \
+                the logging panel cannot be used without it')
+        self.records = {}  # a dictionary that maps threads to log records
 
     def add_record(self, record, thread=None):
-        # Avoid logging SQL queries since they are already in the SQL panel
-        # TODO: Make this check whether SQL panel is enabled
+  # Avoid logging SQL queries since they are already in the SQL panel
+  # TODO: Make this check whether SQL panel is enabled
         if record.get('channel', '') == 'django.db.backends':
             return
 
         self.get_records(thread).append(record)
 
     def get_records(self, thread=None):
-        """
-        Returns a list of records for the provided thread, of if none is provided,
+        '''
+        Returns a list of records for the provided thread, of if none is
+        provided,
         returns a list for the current thread.
-        """
+        '''
         if thread is None:
             thread = threading.currentThread()
         if thread not in self.records:
@@ -42,6 +45,7 @@ class LogCollector(object):
 
 
 class ThreadTrackingHandler(logging.Handler):
+
     def __init__(self, collector):
         logging.Handler.__init__(self)
         self.collector = collector
@@ -67,11 +71,14 @@ try:
     import logbook
     logbook_supported = True
 except ImportError:
-    # logbook support is optional, so fail silently
+  # logbook support is optional, so fail silently
     logbook_supported = False
 
+
 if logbook_supported:
+
     class LogbookThreadTrackingHandler(logbook.handlers.Handler):
+
         def __init__(self, collector):
             logbook.handlers.Handler.__init__(self, bubble=True)
             self.collector = collector
@@ -87,9 +94,9 @@ if logbook_supported:
             }
             self.collector.add_record(record)
 
-
     logbook_handler = LogbookThreadTrackingHandler(collector)
-    logbook_handler.push_application()        # register with logbook
+    logbook_handler.push_application()  # register with logbook
+
 
 class LoggingPanel(DebugPanel):
     name = 'Logging'
@@ -101,7 +108,18 @@ class LoggingPanel(DebugPanel):
 
     def process_response(self, request, response):
         records = self.get_and_delete()
-        self.record_stats({'records': records})
+        channels = utils.Counter()
+        levels = utils.Counter()
+        for record in records:
+            channels[record['channel']] += 1
+            levels[record['level']] += 1
+
+        self.record_stats({
+            'records': records,
+            'channels': channels.most_common(),
+            'levels': levels.most_common(),
+        })
+
 
     def get_and_delete(self):
         records = collector.get_records()
@@ -109,7 +127,7 @@ class LoggingPanel(DebugPanel):
         return records
 
     def nav_title(self):
-        return _("Logging")
+        return _('Logging')
 
     def nav_subtitle(self):
         stats = self.get_stats()
@@ -129,3 +147,4 @@ class LoggingPanel(DebugPanel):
 
     def url(self):
         return ''
+

@@ -137,6 +137,25 @@ window.djdt = (function(window, document, jQuery) {
 			}, function(){
 			    $(this).removeClass('djDebugHover');
 			});
+			
+			/* allow <input class="filter"> to toggle the display of items
+			* with `value` as the jQuery selector */
+			$('input.filter').click(function(){
+			    var objects = $(this.value);
+			    objects.toggle(objects.attr('checked'));
+			});
+			$('input.filter').attr('checked', true);
+
+			$('input.search').keydown(function(){
+			    if(this.value){
+			        $(this.name).closest('tr').hide();
+			        $(this.name + ':contains(' + this.value + ')').closest('tr').show();
+			    }else{
+			        $(this.name).closest('tr').show();
+			    }
+			});
+			$('input.filter').keyup();
+
 			djdt.isReady = true;
 			$.each(djdt.events.ready, function(_, callback){
 			    callback(djdt);

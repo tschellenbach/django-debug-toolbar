@@ -110,6 +110,12 @@ class CacheDebugPanel(DebugPanel):
 
     def nav_subtitle(self):
         calls = len(self.cache.stats['calls'])
+        if self.cache.stats['hits']:
+            hitpct = 100. * self.cache.stats['hits'] / (
+                self.cache.stats['hits'] + self.cache.stats['misses'])
+        else:
+            hitpct = 100.
+
         return __(
             '%(calls)d calls, %(time).2fms, %(hitpct).1f%% hit',
             '%(calls)d calls, %(time).2fms, %(hitpct).1f%% hit',
@@ -117,8 +123,7 @@ class CacheDebugPanel(DebugPanel):
         ) % dict(
             calls=calls,
             time=self.cache.stats['total_time'],
-            hitpct=100. * self.cache.stats['hits'] / (
-                self.cache.stats['hits'] + self.cache.stats['misses']),
+            hitpct=hitpct,
         )
 
     def title(self):

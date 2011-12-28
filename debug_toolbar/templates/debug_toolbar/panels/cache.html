@@ -12,26 +12,26 @@
 	</colgroup>
 	<tr>
 		<th>{% trans "Total Calls" %}</th>
-		<td>{{ cache_calls }}</td>
+		<td>{{ stats.calls|length }}</td>
 		<th>{% trans "Total Time" %}</th>
-		<td>{{ cache_time }}ms</td>
+		<td>{{ stats.total_time }}ms</td>
 		<th>{% trans "Hits" %}</th>
-		<td>{{ cache.hits }}</td>
+		<td>{{ stats.hits }}</td>
 		<th>{% trans "Misses" %}</th>
-		<td>{{ cache.misses }}</td>
+		<td>{{ stats.misses }}</td>
 	</tr>
 	<tr>
 		<th>gets</th>
-		<td>{{ cache.gets }}</td>
+		<td>{{ stats.gets }}</td>
 		<th>sets</th>
-		<td>{{ cache.sets }}</td>
+		<td>{{ stats.sets }}</td>
 		<th>deletes</th>
-		<td>{{ cache.deletes }}</td>
+		<td>{{ stats.deletes }}</td>
 		<th>get_many</th>
-		<td>{{ cache.get_many }}</td>
+		<td>{{ stats.get_many }}</td>
 	</tr>
 </table>
-{% if cache.calls %}
+{% if stats.calls %}
 <h3>{% trans "Breakdown" %}</h3>
 <table>
 	<thead>
@@ -43,7 +43,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		{% for query in cache.calls %}
+		{% for query in stats.calls %}
 			<tr class="{% cycle 'row1' 'row2' %}">
 				<td>{{ query.0|floatformat:"4" }}</td>
 				<td>{{ query.1|escape }}</td>

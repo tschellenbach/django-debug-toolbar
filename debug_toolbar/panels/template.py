@@ -105,6 +105,9 @@ class TemplateDebugPanel(DebugPanel):
                             pformat(value)  # this MAY trigger a db query
                         except SQLQueryTriggered:
                             temp_layer[key] = '<<triggers database query>>'
+                        except UnicodeEncodeError:
+                            temp_layer[key] = ('UnicodeEncodeError when '
+                                'parsing %r. Type: %s' % (key, type(value)))
                         else:
                             temp_layer[key] = value
                         finally:

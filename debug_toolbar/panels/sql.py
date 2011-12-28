@@ -313,7 +313,6 @@ class SQLDebugPanel(DebugPanel):
 
         for alias, query in self._queries:
             sql = func(self._anonymize_query(query[sql_attr]))
-            query['hash'] = hash(sql)
             # Add this query to the list of occurrances for this query.
             data = self._seen.get(sql, {
                 'time': 0,

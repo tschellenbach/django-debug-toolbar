@@ -53,7 +53,10 @@ def sql_select(request):
         cursor.close()
         context = {
             'result': result,
-            'sql': reformat_sql(cursor.db.ops.last_executed_query(cursor, sql, params)),
+            'sql': reformat_sql(
+                cursor.db.ops.last_executed_query(cursor, sql, params),
+                expand=False,
+            ),
             'duration': request.GET.get('duration', 0.0),
             'headers': headers,
             'alias': alias,
@@ -98,7 +101,10 @@ def sql_explain(request):
         cursor.close()
         context = {
             'result': result,
-            'sql': reformat_sql(cursor.db.ops.last_executed_query(cursor, sql, params)),
+            'sql': reformat_sql(
+                cursor.db.ops.last_executed_query(cursor, sql, params),
+                expand=False,
+            ),
             'duration': request.GET.get('duration', 0.0),
             'headers': headers,
             'alias': alias,

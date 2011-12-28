@@ -390,7 +390,7 @@ def swap_fields(sql):
     else:
         return sql
 
-def reformat_sql(sql, tables=None):
+def reformat_sql(sql, tables=None, expand=True):
     stack = sqlparse.engine.FilterStack()
     options = sqlparse.formatter.validate_options(dict(reindent=True))
     stack = sqlparse.formatter.build_filter_stack(stack, options)
@@ -415,6 +415,7 @@ def reformat_sql(sql, tables=None):
             )
         )
 
-    sql = swap_fields(sql).replace('...', '&bull;'*3)
+    if expand:
+        sql = swap_fields(sql).replace('...', '&bull;'*3)
     return sql
 

@@ -313,11 +313,12 @@ class SQLDebugPanel(DebugPanel):
 
         for alias, query in self._queries:
             sql = func(self._anonymize_query(query[sql_attr]))
+            query['unique_hash'] = hash(sql)
             # Add this query to the list of occurrances for this query.
             data = self._seen.get(sql, {
                 'time': 0,
                 'queries': [],
-                'hash': hash(sql),
+                'unique_hash': hash(sql),
                 'tables': query['tables'],
                 'alias': query['alias'],
             })

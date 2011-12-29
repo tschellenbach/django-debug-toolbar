@@ -46,7 +46,12 @@
 	<table>
 		<thead>
 		  <tr>
-		    <th></th>
+		    <th>
+		        <input
+		            class="group_filter"
+                    value="input.filter[value^=.query_group_]"
+                    type="checkbox">
+            </th>
 			<th class="toggle">&nbsp;</th>
 			<th class="query">{% trans 'Query' %}</th>
 			<th>{% trans 'Executions' %}</th>
@@ -87,7 +92,7 @@
 				    id="sqlMain_unique_query_{{ forloop.counter }}">
 		            <td><input
 		                class="filter"
-                        value=".query_group_{{ data.hash }}"
+                        value=".query_group_{{ data.unique_hash }}"
                         type="checkbox"></td>
 					<td class="toggle">
 						<a class="djToggleSwitch" data-toggle-id="unique_query_{{ forloop.counter }}" data-toggle-open="+" data-toggle-close="-" href="javascript:void(0)">+</a>
@@ -126,7 +131,7 @@
 			{% for query in queries %}
 				<tr class="{% spaceless %}
 				        djDebugHoverable
-				        query_group_{{ query.hash }}
+				        query_group_{{ query.unique_hash }}
 				        {% for table in query.tables %}
 				        query_table_{{ table }}
 				        {% endfor %}

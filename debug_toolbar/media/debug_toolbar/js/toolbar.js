@@ -140,11 +140,17 @@ window.djdt = (function(window, document, jQuery) {
 			
 			/* allow <input class="filter"> to toggle the display of items
 			* with `value` as the jQuery selector */
-			$('input.filter').click(function(){
+			$('input.filter').change(function(){
 			    var objects = $(this.value);
 			    objects.toggle(objects.attr('checked'));
 			});
 			$('input.filter').attr('checked', true);
+			$('input.group_filter').change(function(){
+			    var objects = $(this.value);
+			    objects.attr('checked', $(this).attr('checked'));
+			    objects.change();
+			});
+			$('input.group_filter').attr('checked', true);
 
 			$('input.search').keydown(function(){
 			    if(this.value){
@@ -154,7 +160,6 @@ window.djdt = (function(window, document, jQuery) {
 			        $(this.name).closest('tr').show();
 			    }
 			});
-			$('input.filter').keyup();
 
 			djdt.isReady = true;
 			$.each(djdt.events.ready, function(_, callback){

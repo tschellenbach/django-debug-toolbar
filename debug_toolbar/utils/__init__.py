@@ -114,6 +114,10 @@ def getframeinfo(frame, context=1):
     if not inspect.isframe(frame):
         raise TypeError('arg is not a frame or traceback object')
 
+    template = frame.f_globals.get('__jinja_template__')
+    if template is not None:
+        lineno = template.get_corresponding_lineno(lineno)
+
     filename = inspect.getsourcefile(frame) or inspect.getfile(frame)
     if context > 0:
         start = lineno - 1 - context//2

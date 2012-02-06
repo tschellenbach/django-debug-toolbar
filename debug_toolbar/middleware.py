@@ -7,7 +7,6 @@ import thread
 from django.conf import settings
 from django.conf.urls.defaults import include, patterns
 from django.http import HttpResponseRedirect
-from django.shortcuts import render_to_response
 from django.utils.encoding import smart_unicode
 from django.utils.importlib import import_module
 
@@ -117,6 +116,7 @@ class DebugToolbarMiddleware(object):
             redirect_to = response.get('Location', None)
             if redirect_to:
                 cookies = response.cookies
+                from django.shortcuts import render_to_response
                 response = render_to_response(
                     'debug_toolbar/redirect.html',
                     {'redirect_to': redirect_to}

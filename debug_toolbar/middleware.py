@@ -123,7 +123,22 @@ class DebugToolbarMiddleware(object):
                 )
                 response.cookies = cookies
         if 'gzip' not in response.get('Content-Encoding', '') and \
-           response.get('Content-Type', '').split(';')[0] in _HTML_TYPES:
+           (html_type or request.GET.get('debug')):
+            if not html_type:
+                response.content = '''
+                <html>
+                    <head>
+                        <title>Debugging %(url)r</title>
+                    </head>
+                    <body>
+                        <pre style="height: 100%%; width: 100%%;">%(content)s</pre>
+                    </body>
+                </html>''' % dict(
+                    url=request.get_full_path(),
+                    content=response.content,
+                )
+                response['content-type'] = 'text/html'
+
             for panel in toolbar.panels:
                 panel.process_response(request, response)
             response.content = replace_insensitive(

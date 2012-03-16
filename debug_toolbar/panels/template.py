@@ -4,6 +4,7 @@ from pprint import pformat
 from django import http
 from django.conf import settings
 from django.template.context import get_standard_processors
+from django.template.loader import render_to_string
 from django.test.signals import template_rendered
 from django.utils.translation import ugettext_lazy as _
 from django.db.models.query import QuerySet
@@ -82,7 +83,11 @@ class TemplateDebugPanel(DebugPanel):
                     [(c['time'], c['args'][1], 'jinja', c['stack']) for c in get_stats().get_calls('templates:jinja')] + \
                     [(c['time'], c['args'][0].name, 'django', c['stack']) for c in get_stats().get_calls('templates:django')],
         )
-        return render_to_string('debug_toolbar/panels/templates.html', context)
+        try:
+            return render_to_string('debug_toolbar/panels/templates.html', context)
+        except Exception, e:
+            print e
+            return repr(e)
 
     def __init__(self, *args, **kwargs):
         super(TemplateDebugPanel, self).__init__(*args, **kwargs)
@@ -197,6 +202,7 @@ class TemplateDebugPanel(DebugPanel):
             if getattr(settings, 'DEBUG_TOOLBAR_CONFIG', {}).get('SHOW_TEMPLATE_CONTEXT', True):
                 context_list = template_data.get('context', [])
                 info['context'] = '\n'.join(context_list)
+
             template_context.append(info)
         
         self.record_stats({

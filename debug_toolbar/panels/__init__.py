@@ -39,9 +39,15 @@ class DebugPanel(object):
 
     def content(self):
         if self.has_content:
-            context = self.context.copy()
-            context.update(self.get_stats())
-            return render_to_string(self.template, context)
+            try:
+                context = self.context
+                context.update(self.get_stats())
+                return render_to_string(self.template, context)
+            except Exception, e:
+                import sys
+                print >>sys.stderr, 'Got exception when rendering %s: %r: %s' % (
+                    self.template, e, e)
+                raise
 
     def record_stats(self, stats):
         # import locally to work around recursive imports

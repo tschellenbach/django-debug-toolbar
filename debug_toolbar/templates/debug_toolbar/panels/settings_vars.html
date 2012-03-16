@@ -1,4 +1,8 @@
 {% load i18n %}
+<fieldset class="djFieldSet">
+	<legend>Search</legend>
+	<input type="text" class="search" name=".settings_vars_search .settings_vars_searchable">
+</fieldset>
 <table>
 	<thead>
 		<tr>
@@ -8,9 +12,9 @@
 	</thead>
 	<tbody>
 		{% for var in settings.items|dictsort:"0" %}
-			<tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}">
-				<td>{{ var.0 }}</td>
-				<td><code>{{ var.1|pprint }}</code></td>
+			<tr class="settings_vars_search {% cycle 'djDebugOdd' 'djDebugEven' %}">
+				<td class="settings_vars_searchable">{{ var.0 }}</td>
+				<td class="settings_vars_searchable"><code>{{ var.1|pprint }}</code></td>
 			</tr>
 		{% endfor %}
 	</tbody>

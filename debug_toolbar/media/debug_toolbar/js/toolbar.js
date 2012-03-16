@@ -10,6 +10,14 @@ window.djdt = (function(window, document, jQuery) {
 		isReady: false,
 		init: function() {
 			$('#djDebug').show();
+
+			if(typeof(localStorage) != 'undefined' && localStorage['djDebugToolbarShowPanel']){
+			    var className = localStorage['djDebugToolbarShowPanel'];
+				$('#djDebug #' + className).show();
+				$('#djDebugToolbar li').removeClass('active');
+				$('#djDebugPanelList li a.' + className).parent().addClass('active');
+			}
+
 			var current = null;
 			$('#djDebugPanelList li a').click(function() {
 				if (!this.className) {
@@ -19,8 +27,10 @@ window.djdt = (function(window, document, jQuery) {
 				if (current.is(':visible')) {
 				    $(document).trigger('close.djDebug');
 					$(this).parent().removeClass('active');
+					if(typeof(localStorage) != 'undefined')localStorage['djDebugToolbarShowPanel'] = '';
 				} else {
 					$('.panelContent').hide(); // Hide any that are already open
+					if(typeof(localStorage) != 'undefined')localStorage['djDebugToolbarShowPanel'] = this.className;
 					current.show();
 					$('#djDebugToolbar li').removeClass('active');
 					$(this).parent().addClass('active');

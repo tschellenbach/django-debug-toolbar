@@ -491,6 +491,7 @@
 #djDebug .panelContent ul.stats li {
     width: 30%;
     float: left;
+    list-style-type: none;
 }
 #djDebug .panelContent ul.stats li strong.label {
     display: block;

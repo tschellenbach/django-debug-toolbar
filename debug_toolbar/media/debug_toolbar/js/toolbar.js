@@ -150,11 +150,16 @@ window.djdt = (function(window, document, jQuery) {
 			
 			/* allow <input class="filter"> to toggle the display of items
 			* with `value` as the jQuery selector */
-			$('input.filter').click(function(){
+			$('input.filter').change(function(){
 			    var objects = $(this.value);
-			    objects.toggle(objects.attr('checked'));
+			    objects.toggle(this.checked);
 			});
-			$('input.filter').attr('checked', true);
+			$('input.filter_all').change(function(){
+			    var objects = $(this.value);
+			    objects.attr('checked', this.checked);
+			    objects.change();
+			});
+			$('input.filter, input.filter_all').attr('checked', true);
 
 			$('input.search').keydown(function(){
 			    if(this.value){

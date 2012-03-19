@@ -4,6 +4,7 @@ from pprint import pformat
 from django import http
 from django.conf import settings
 from django.template.context import get_standard_processors
+from django.template.loader import render_to_string
 from django.test.signals import template_rendered
 from django.utils.translation import ugettext_lazy as _
 from django.db.models.query import QuerySet
@@ -18,6 +19,9 @@ from debug_toolbar.utils.tracking.db import recording, SQLQueryTriggered
 # e-mail interception, which we don't want
 from django.test.utils import instrumented_test_render
 from django.template import Template
+from django.dispatch import Signal
+
+get_template = Signal(providing_args=['template'])
 
 if not hasattr(Template, '_render'): # Django < 1.2
     if Template.render != instrumented_test_render:
@@ -33,17 +37,26 @@ else:
 def new_render(func):
     def render(self, context=None):
         template_rendered.send(sender=self, template=self,
-                               context=context)
+            context=context)
         return func(self, context)
     return render
 
+def track(f, name):
+    def _track(env, filename, *a, **kw):
+        ret = f(env, filename, *a, **kw)
+        get_template.send(sender=name, filename=filename)
+        return ret
+
+    return _track
 
 try:
-    import coffin
+    import jinja2
 except ImportError:
     pass
 else:
-    coffin.template.Template.render = new_render(coffin.template.Template.render)
+    jinja2.Template.render = new_render(jinja2.Template.render)
+    jinja2.Environment.get_template = track(jinja2.Environment.get_template,
+        'templates:jinja2')
 
 
 # MONSTER monkey-patch
@@ -62,21 +75,47 @@ class TemplateDebugPanel(DebugPanel):
     template = 'debug_toolbar/panels/templates.html'
     has_content = True
     
+    def jinjacontent(self):
+        context = dict(
+            template_calls = self.do_stat_call('get_total_calls'),
+            template_time = self.do_stat_call('get_total_time'),
+            template_calls_list = [(c['time'], c['args'][1], 'jinja2', c['stack']) for c in get_stats().get_calls('templates:jinja2')] + \
+                    [(c['time'], c['args'][1], 'jinja', c['stack']) for c in get_stats().get_calls('templates:jinja')] + \
+                    [(c['time'], c['args'][0].name, 'django', c['stack']) for c in get_stats().get_calls('templates:django')],
+        )
+        try:
+            return render_to_string('debug_toolbar/panels/templates.html', context)
+        except Exception, e:
+            print e
+            return repr(e)
+
     def __init__(self, *args, **kwargs):
         super(TemplateDebugPanel, self).__init__(*args, **kwargs)
         self.templates = []
         template_rendered.connect(self._store_template_info)
+        get_template.connect(self._store_template_info)
+        self.context = None
     
     def _store_template_info(self, sender, **kwargs):
-        t = kwargs['template']
-        if t.name and t.name.startswith('debug_toolbar/'):
+        t = kwargs.get('template')
+        if t:
+            name = t.name
+        else:
+            name = kwargs['filename']
+
+        if name and name.startswith('debug_toolbar/'):
             return  # skip templates that we are generating through the debug toolbar.
-        context_data = kwargs['context']
+
+        context_data = kwargs.get('context')
+        if context_data is None:
+            context_data = self.context
+        else:
+            self.context = context_data
         
         #context_data can be either a dict or a context data object
         context_list = []
-        context_data_dicts = [context_data]
-        if hasattr(context_data, 'dicts'):
+        context_data_dicts = [context_data or {}]
+        if context_data and hasattr(context_data, 'dicts'):
             context_data_dicts = context_data.dicts
             
         for context_layer in context_data_dicts:
@@ -141,20 +180,32 @@ class TemplateDebugPanel(DebugPanel):
             ]
         )
         template_context = []
+        templates = dict()
         for template_data in self.templates:
             info = {}
             # Clean up some info about templates
-            template = template_data.get('template', None)
+            if 'template' in template_data:
+                template = template_data['template']
+            else:
+                class template(object):
+                    name = template_data['filename']
+
             if hasattr(template, 'origin') and hasattr(template.origin, 'name'):
                 template.origin_name = template.origin.name
             else:
                 template.origin_name = 'No origin'
+
+            if template.name in templates:
+                continue
+            else:
+                templates[template.name] = None
 
             info['template'] = template
             # Clean up context for better readability
             if getattr(settings, 'DEBUG_TOOLBAR_CONFIG', {}).get('SHOW_TEMPLATE_CONTEXT', True):
                 context_list = template_data.get('context', [])
                 info['context'] = '\n'.join(context_list)
+
             template_context.append(info)
         
         self.record_stats({

@@ -4,17 +4,21 @@
 	<fieldset class="djFieldSet">
 	    <legend>Databases</legend>
 	    <ul class="stats">
+		    <li>
+		        <input id="database_filter_all" type="checkbox" class="filter_all" value="input.database_filter">
+		        <label for="database_filter_all">All</label>
+		    </li>
 		    {% for alias, info in databases %}
 		    <li>
-		        <input class="filter"
+		        <input
+		            class="filter database_filter"
 		            value=".query_database_{{ alias }}"
 		            id="database_filter_{{ alias }}" 
 		            type="checkbox">
-
 		        <label for="database_filter_{{ alias }}">
-			        <strong class="label">
+			        <strong class="label" style="display: inline;">
 			            <span style="background-color: rgb({{ info.rgb_color|join:", " }})" class="color">&nbsp;</span>
-			            {{ alias }}
+			            <span>{{ alias }}</span>
 			        </strong>
 
 				    {{ info.time_spent|floatformat:"2" }} ms
@@ -28,10 +32,14 @@
 	<fieldset class="djFieldSet">
 	    <legend>Tables</legend>
 	    <ul class="stats">
+		    <li>
+		        <input id="table_filter_all" type="checkbox" class="filter_all" value="input.table_filter">
+		        <label for="table_filter_all">All</label>
+		    </li>
 	        {% for table in tables %}
 		    <li>
 		        <input
-		            class="filter"
+		            class="filter table_filter"
                     value=".query_table_{{ table }}"
                     id="table_filter_{{ table }}"
 		            type="checkbox">
@@ -46,12 +54,7 @@
 	<table>
 		<thead>
 		  <tr>
-		    <th>
-		        <input
-		            class="group_filter"
-                    value="input.filter[value^=.query_group_]"
-                    type="checkbox">
-            </th>
+		    <th><input type="checkbox" class="filter_all" value="input.unique_filter"></th>
 			<th class="toggle">&nbsp;</th>
 			<th class="query">{% trans 'Query' %}</th>
 			<th>{% trans 'Executions' %}</th>
@@ -91,8 +94,8 @@
 				    "
 				    id="sqlMain_unique_query_{{ forloop.counter }}">
 		            <td><input
-		                class="filter"
-                        value=".query_group_{{ data.unique_hash }}"
+		                class="filter unique_filter"
+                        value=".query_group_{{ data.hash }}"
                         type="checkbox"></td>
 					<td class="toggle">
 						<a class="djToggleSwitch" data-toggle-id="unique_query_{{ forloop.counter }}" data-toggle-open="+" data-toggle-close="-" href="javascript:void(0)">+</a>
@@ -131,7 +134,7 @@
 			{% for query in queries %}
 				<tr class="{% spaceless %}
 				        djDebugHoverable
-				        query_group_{{ query.unique_hash }}
+				        query_group_{{ query.hash }}
 				        {% for table in query.tables %}
 				        query_table_{{ table }}
 				        {% endfor %}

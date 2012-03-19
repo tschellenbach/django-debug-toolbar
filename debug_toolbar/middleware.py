@@ -7,7 +7,6 @@ import thread
 from django.conf import settings
 from django.conf.urls.defaults import include, patterns
 from django.http import HttpResponseRedirect
-from django.shortcuts import render_to_response
 from django.utils.encoding import smart_unicode
 from django.utils.importlib import import_module
 
@@ -117,13 +116,31 @@ class DebugToolbarMiddleware(object):
             redirect_to = response.get('Location', None)
             if redirect_to:
                 cookies = response.cookies
+                from django.shortcuts import render_to_response
                 response = render_to_response(
                     'debug_toolbar/redirect.html',
                     {'redirect_to': redirect_to}
                 )
                 response.cookies = cookies
+
+        html_type = response.get('Content-Type', '').split(';')[0] in _HTML_TYPES
         if 'gzip' not in response.get('Content-Encoding', '') and \
-           response.get('Content-Type', '').split(';')[0] in _HTML_TYPES:
+           (html_type or request.GET.get('debug')):
+            if not html_type:
+                response.content = '''
+                <html>
+                    <head>
+                        <title>Debugging %(url)r</title>
+                    </head>
+                    <body>
+                        <pre style="height: 100%%; width: 100%%;">%(content)s</pre>
+                    </body>
+                </html>''' % dict(
+                    url=request.get_full_path(),
+                    content=response.content,
+                )
+                response['content-type'] = 'text/html'
+
             for panel in toolbar.panels:
                 panel.process_response(request, response)
             response.content = replace_insensitive(

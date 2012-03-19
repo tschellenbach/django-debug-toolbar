@@ -491,6 +491,7 @@
 #djDebug .panelContent ul.stats li {
     width: 30%;
     float: left;
+    list-style-type: none;
 }
 #djDebug .panelContent ul.stats li strong.label {
     display: block;
@@ -583,13 +584,15 @@
     }
 }
 
-#djDebug fieldset.djFieldSet, #djDebug fieldset.djFieldSet legend{
-    border: 1px solid #fff;
-}
-
-#djDebug fieldset.djFieldSet li, #djDebug fieldset.djFieldSet .label, #djDebug fieldset.djFieldSet input{
-    list-style-type: none;
-    margin: 0px 5px;
+#djDebug p.fieldset{
+    border: 1px solid #999;
     float: left;
+    display: inline;
+    margin: 2px;
+    padding: 2px;
+    background-color: #ccc;
+}
+#djDebug p.fieldset span.legend{
+    font-weight: bold;
 }
 

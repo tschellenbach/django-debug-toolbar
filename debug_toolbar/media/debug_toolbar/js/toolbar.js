@@ -10,6 +10,14 @@ window.djdt = (function(window, document, jQuery) {
 		isReady: false,
 		init: function() {
 			$('#djDebug').show();
+
+			if(typeof(localStorage) != 'undefined' && localStorage['djDebugToolbarShowPanel']){
+			    var className = localStorage['djDebugToolbarShowPanel'];
+				$('#djDebug #' + className).show();
+				$('#djDebugToolbar li').removeClass('active');
+				$('#djDebugPanelList li a.' + className).parent().addClass('active');
+			}
+
 			var current = null;
 			$('#djDebugPanelList li a').click(function() {
 				if (!this.className) {
@@ -19,8 +27,10 @@ window.djdt = (function(window, document, jQuery) {
 				if (current.is(':visible')) {
 				    $(document).trigger('close.djDebug');
 					$(this).parent().removeClass('active');
+					if(typeof(localStorage) != 'undefined')localStorage['djDebugToolbarShowPanel'] = '';
 				} else {
 					$('.panelContent').hide(); // Hide any that are already open
+					if(typeof(localStorage) != 'undefined')localStorage['djDebugToolbarShowPanel'] = this.className;
 					current.show();
 					$('#djDebugToolbar li').removeClass('active');
 					$(this).parent().addClass('active');
@@ -142,15 +152,14 @@ window.djdt = (function(window, document, jQuery) {
 			* with `value` as the jQuery selector */
 			$('input.filter').change(function(){
 			    var objects = $(this.value);
-			    objects.toggle(objects.attr('checked'));
+			    objects.toggle(this.checked);
 			});
-			$('input.filter').attr('checked', true);
-			$('input.group_filter').change(function(){
+			$('input.filter_all').change(function(){
 			    var objects = $(this.value);
-			    objects.attr('checked', $(this).attr('checked'));
+			    objects.attr('checked', this.checked);
 			    objects.change();
 			});
-			$('input.group_filter').attr('checked', true);
+			$('input.filter, input.filter_all').attr('checked', true);
 
 			$('input.search').keydown(function(){
 			    if(this.value){
@@ -160,6 +169,7 @@ window.djdt = (function(window, document, jQuery) {
 			        $(this.name).closest('tr').show();
 			    }
 			});
+			$('input.filter').keyup();
 
 			djdt.isReady = true;
 			$.each(djdt.events.ready, function(_, callback){

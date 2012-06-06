@@ -27,6 +27,7 @@ ANONYMIZE_QUERY_REPLACEMENTS = (
     (re.compile('(SELECT )(.+?)( FROM)', re.IGNORECASE), r'\g<1>...\g<3>'),
 )
 
+
 def _get_setting(key, default=None):
     return getattr( settings, 'DEBUG_TOOLBAR_CONFIG', {}).get(key, default)
 
@@ -146,7 +147,15 @@ class SQLDebugPanel(DebugPanel):
         self._num_queries += 1
 
     def nav_title(self):
-        return _('SQL')
+        from balancer.mixins import PinningMixin
+        pinned = PinningMixin.is_pinned()
+        colours = dict()
+        colours[True] = '#F66'
+        colours[False] = '#6F6'
+        colour = colours[pinned]
+        message = 'pinned' if pinned else 'not pinned'
+        title = _('SQL') + ' <span style="color:%s;">%s</span>' % (colour, message)
+        return  mark_safe(title)
 
     def nav_subtitle(self):
         # TODO l10n: use ngettext
